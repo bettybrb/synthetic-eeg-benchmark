@@ -1,8 +1,8 @@
-# Synthetic EEG for Motor Imagery Classification
+# Synthetic EEG Benchmark for Motor Imagery Classification
 
 **MSc Artificial Intelligence thesis — Queen Mary University of London, 2026**
 
-An experimental study of whether synthetic EEG can replace participant-specific real training data for motor-imagery classification while validation and testing remain entirely real.
+A reproducible benchmark for evaluating whether synthetic EEG can replace or augment participant-specific training data for motor-imagery classification under real validation and test conditions.
 
 ![Results overview](assets/results_overview.png)
 
@@ -17,9 +17,9 @@ An experimental study of whether synthetic EEG can replace participant-specific 
 
 The main result was a clear distinction between **reconstruction** and **independent generation**. H-VAE reconstructions retained most of the discriminative information present in real trials, while independently generated synthetic EEG performed close to the four-class chance level.
 
-At 50% Gaussian replacement, accuracy fell to **56.35%**. A corresponding 50% augmentation experiment reached **60.34%**, providing no improvement over the real-only baseline.
+At 50% Gaussian replacement, accuracy fell to **56.35%**. Adding Gaussian synthetic EEG equal to 50% of the real training-set size reached **62.12%**, still below the real-only baseline.
 
-## Experimental design
+## Research question\n\nCan synthetic EEG replace participant-specific real EEG when model selection and final evaluation remain entirely real?\n\n## Contributions\n\n- Unified real-vs-synthetic evaluation protocol across 9 participants\n- Eight Gaussian synthetic-data controls\n- H-VAE reconstruction and conditional VAE generation\n- Class-specific and hierarchical conditional VAE variants\n- Replacement and augmentation ratio experiments\n- Fixed ShallowFBCSPNet downstream evaluation across repeated seeds\n- Method-level and participant-level final result summaries\n\n## Experimental design
 
 The experiments use **BCI Competition IV Dataset 2a** across all 9 participants:
 

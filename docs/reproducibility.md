@@ -55,7 +55,7 @@ library/training/soft_dtw_cuda.pyReplaced nested min and max operations for Numb
 
 Braindecode repository
 
-braindecode/datasets/bcic_iv_2a.pyA local modification was detected. Its exact difference still needs to be documented.
+braindecode/datasets/bcic_iv_2a.py\n\nA local compatibility modification was used in the legacy Braindecode dataset loader.
 
 Running the project
 
