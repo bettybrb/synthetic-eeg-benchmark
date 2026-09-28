@@ -1,77 +1,148 @@
-# Synthetic EEG Benchmark for Motor Imagery Classification
+# Synthetic EEG Benchmark
 
-**MSc Artificial Intelligence thesis — Queen Mary University of London, 2026**
+### Evaluating the downstream utility of synthetic EEG for motor imagery classification
 
-A reproducible benchmark for evaluating whether synthetic EEG can replace or augment participant-specific training data for motor-imagery classification under real validation and test conditions.
+**MSc Artificial Intelligence research project — Queen Mary University of London**
+
+This repository benchmarks whether synthetic EEG can replace or augment participant-specific real EEG for four-class motor imagery classification. Generators are fitted only on real training data, model selection uses real validation data, and final performance is measured on a separate real recording session.
 
 ![Results overview](assets/results_overview.png)
 
-## Results
+## Key results
 
-| Training data | Real test accuracy |
+| Training condition | Accuracy on real held-out EEG |
 | --- | ---: |
-| Real EEG | **69.24% ± 16.06** |
+| Real EEG baseline | **69.24% ± 16.06** |
 | H-VAE reconstruction | **68.06% ± 16.62** |
 | Best Gaussian generator | **31.91% ± 5.04** |
-| Conditional VAE | **25.73% ± 1.57** |
+| Conditional VAE generation | **25.73% ± 1.57** |
 
-The main result was a clear distinction between **reconstruction** and **independent generation**. H-VAE reconstructions retained most of the discriminative information present in real trials, while independently generated synthetic EEG performed close to the four-class chance level.
+*Values are macro means across nine participants; ± denotes participant-level standard deviation.*
 
-At 50% Gaussian replacement, accuracy fell to **56.35%**. Adding Gaussian synthetic EEG equal to 50% of the real training-set size reached **62.12%**, still below the real-only baseline.
+The strongest result came from **H-VAE reconstruction**, which retained most of the downstream classification utility of the original trials. This is importantly different from independent generation: each reconstruction originates from an encoded real EEG trial.
 
-## Research question\n\nCan synthetic EEG replace participant-specific real EEG when model selection and final evaluation remain entirely real?\n\n## Contributions\n\n- Unified real-vs-synthetic evaluation protocol across 9 participants\n- Eight Gaussian synthetic-data controls\n- H-VAE reconstruction and conditional VAE generation\n- Class-specific and hierarchical conditional VAE variants\n- Replacement and augmentation ratio experiments\n- Fixed ShallowFBCSPNet downstream evaluation across repeated seeds\n- Method-level and participant-level final result summaries\n\n## Experimental design
+Independent generation was substantially weaker. The best Gaussian method reached **31.91%**, while conditional VAE generation reached **25.73%**, close to the **25% chance level** for four classes.
 
-The experiments use **BCI Competition IV Dataset 2a** across all 9 participants:
+Mixing real and Gaussian synthetic EEG also did not improve on real-only training. Replacing 50% of the real training set reduced accuracy to **56.35%**. Adding synthetic EEG equal to 50% of the real training-set size reached **62.12%**, compared with **69.24%** for real-only training.
 
-- 4 motor-imagery classes: left hand, right hand, feet and tongue
-- 22 EEG channels sampled at 250 Hz
-- 4-second trials represented as 22 × 1000 samples
-- first recording session used for development
-- second recording session held out for final testing
-- generators fitted only on real training data
-- validation and test data always real
+## Benchmark at a glance
 
-For each participant, the development session is split once into 259 training and 29 validation trials. The evaluation session contains 288 held-out test trials.
+| | |
+| --- | --- |
+| Dataset | BCI Competition IV Dataset 2a |
+| Participants | 9 |
+| Motor imagery classes | Left hand, right hand, feet, tongue |
+| EEG channels | 22 |
+| Sampling rate | 250 Hz |
+| Trial representation | 22 × 1000 samples (4 seconds) |
+| Development split | 259 train / 29 validation trials per participant |
+| Final test set | 288 real trials from a separate recording session |
+| Downstream classifier | ShallowFBCSPNet |
+| Classifier seeds | 3 |
+| Generator seeds | 3 |
+| Primary benchmark runs | **999 successful classifier runs** |
 
-## Methods
+## Research question
 
-The same **ShallowFBCSPNet** downstream classifier is used across conditions so that the source of the training EEG is the primary experimental variable.
+**Can synthetic EEG replace participant-specific real EEG for classifier training without losing performance on a separate real recording session, and can synthetic data help through partial replacement or augmentation?**
 
-Synthetic conditions include:
+The benchmark was designed around downstream utility rather than visual similarity: synthetic EEG is useful only if a classifier trained on it can generalise to real unseen EEG.
 
-- eight Gaussian controls with different class, channel and time conditioning
-- H-VAE reconstruction using hvEEGNet
-- conditional VAE prior generation
-- exploratory class-specific and hierarchical conditional VAE variants
-- synthetic replacement and augmentation ratio experiments
+## Experimental protocol
 
-Classifier runs use three random seeds, with independent generator seeds used for synthetic generation experiments.
+```text
+BCI Competition IV 2a — repeated independently for each participant
 
-## Why this matters
+Session 1: development data (288 real trials)
+├── 259 training trials ──> fit generator ──> real / synthetic / mixed classifier training
+└──  29 validation trials ─────────────────> model selection
 
-The experiments show that producing EEG that preserves or resembles properties of the original signal is not sufficient evidence that the data are useful for downstream learning.
+Session 2: 288 real trials ────────────────> final held-out evaluation
+```
 
-The reconstruction model preserved existing task-relevant information, but the independently generative approaches did not reproduce enough discriminative structure to replace real participant-specific EEG under this protocol.
+The generator never receives validation or test EEG. Validation and testing remain real in every condition.
+
+## Methods compared
+
+| Method family | Role in the benchmark |
+| --- | --- |
+| Real EEG | Reference baseline |
+| 8 Gaussian generators | Statistical controls conditioned on combinations of class, channel and time |
+| H-VAE / hvEEGNet | Reconstruction-based synthetic EEG |
+| Conditional VAE | Independent class-conditioned generation from a latent prior |
+| Class-specific VAE | Exploratory class-specific generative variant |
+| Hierarchical conditional VAE | Exploratory hierarchical latent-prior variant |
+| Replacement experiments | Replace increasing fractions of real training EEG with synthetic EEG |
+| Augmentation experiments | Add increasing amounts of synthetic EEG to the complete real training set |
+
+All conditions use the same downstream classifier so that the main experimental variable is the source of the classifier training data.
+
+## Main contribution
+
+The project provides one controlled evaluation framework connecting multiple synthetic EEG approaches to the same participant-specific data splits, classifier, real validation protocol and held-out real test session.
+
+The implementation includes:
+
+- a unified real-versus-synthetic classification protocol across all nine participants;
+- eight Gaussian controls for testing which marginal statistics are useful;
+- H-VAE reconstruction using hvEEGNet and Soft-DTW;
+- conditional, class-specific and hierarchical VAE generation;
+- independent classifier and generator seeds;
+- replacement and augmentation ratio experiments;
+- automatic completeness checks for all **999 primary benchmark runs**;
+- participant-level and method-level result summaries.
+
+## Interpretation
+
+The results separate **signal reconstruction** from **independent synthetic generation**.
+
+H-VAE reconstruction achieved performance close to the real-data baseline because it preserved information already present in encoded real trials. It should therefore not be interpreted as evidence that the model learned to generate equally useful EEG independently.
+
+By contrast, samples generated independently from Gaussian or learned VAE priors did not preserve enough class-discriminative structure to replace participant-specific real EEG under this protocol. Increasing Gaussian replacement consistently reduced performance, while Gaussian augmentation also remained below the real-only baseline.
 
 ## Repository structure
 
 ```text
-eeg_pipeline/
-  pipeline/       Core data, classifier, generator and evaluation code
-  experiments/    Generation and downstream evaluation experiments
-scripts/           Final experiment runner
-results/           Final summary tables
-assets/            Portfolio figures
-docs/              Reproducibility notes
-requirements/      Locked classifier and VAE environments
+synthetic-eeg-benchmark/
+├── eeg_pipeline/
+│   ├── pipeline/          Core data, classifier, generator and evaluation logic
+│   └── experiments/       Generation and benchmark experiment entry points
+├── scripts/
+│   └── run_final_pipeline.sh
+├── results/
+│   ├── method_summary.csv
+│   ├── participant_summary.csv
+│   └── ratios/
+├── assets/
+│   └── results_overview.png
+├── docs/
+│   ├── reproducibility.md
+│   └── upstream-high-gamma-license.txt
+└── requirements/
+    ├── classifier.txt
+    └── vae.txt
 ```
 
-## Reproducibility
+## Results and reproducibility
 
-The original EEG recordings, generated arrays and model checkpoints are not distributed in this repository.
+The repository keeps compact final summaries rather than thousands of intermediate run rows:
 
-Environment details, external repository versions and modifications are documented in [`docs/reproducibility.md`](docs/reproducibility.md).
+- [`results/method_summary.csv`](results/method_summary.csv) — primary method comparison;
+- [`results/participant_summary.csv`](results/participant_summary.csv) — participant-level results;
+- [`results/ratios/`](results/ratios/) — replacement and augmentation summaries.
+
+Raw EEG recordings, generated EEG arrays, trained model checkpoints and logs are intentionally not stored in Git.
+
+Exact environment versions, external repository commits, compatibility modifications and execution instructions are documented in [`docs/reproducibility.md`](docs/reproducibility.md).
+
+## Limitations
+
+The benchmark contains nine participants from one motor imagery dataset and evaluates participant-specific models. Results therefore describe this experimental protocol rather than synthetic EEG in general. Reconstruction and independent generation are also fundamentally different tasks and are reported separately for that reason.
 
 ## Tech
 
-Python · PyTorch · Braindecode · NumPy · EEG · Brain-computer interfaces · Variational autoencoders · Synthetic data · Experimental evaluation
+**Python · PyTorch · Braindecode · NumPy · Numba/CUDA · EEG · Brain-computer interfaces · Variational autoencoders · Synthetic data · Experimental evaluation**
+
+## Upstream components
+
+The project uses pinned versions of legacy Braindecode and an external hvEEGNet implementation. Their exact commits and the compatibility changes used for this benchmark are documented in the reproducibility notes. An upstream license notice retained from the legacy High-Gamma/Braindecode codebase is stored separately under `docs/`.
