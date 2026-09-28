@@ -2,7 +2,9 @@
 
 set -Eeuo pipefail
 
-PROJECT_ROOT="/home/jovyan/eeg-repro/high-gamma-data"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$REPO_ROOT/eeg_pipeline"
 CLASSIFIER_PY="$PROJECT_ROOT/../env/bin/python"
 VAE_PY="$PROJECT_ROOT/../vae-env/bin/python"
 
@@ -17,7 +19,7 @@ cd "$PROJECT_ROOT"
 export PYTHONUNBUFFERED=1
 
 # Numba must see the local CUDA toolkit before Python starts.
-export CUDA_HOME="$PROJECT_ROOT/.cuda-numba"
+export CUDA_HOME="${CUDA_HOME:-$REPO_ROOT/.cuda-numba}"
 export LD_LIBRARY_PATH="$CUDA_HOME/lib:$CUDA_HOME/lib64:$CUDA_HOME/nvvm/lib64:${LD_LIBRARY_PATH:-}"
 
 export MNE_DATA="$PROJECT_ROOT/data/raw_data"

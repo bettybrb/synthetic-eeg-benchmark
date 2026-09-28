@@ -1,33 +1,24 @@
-# Python environments
 env/
 vae-env/
 .venv/
 venv/
 
-# Python cache
 __pycache__/
 *.py[cod]
 .pytest_cache/
-
-# Jupyter-generated files
 .ipynb_checkpoints/
 
-# Local CUDA and compiled dependencies
-high-gamma-data/.cuda-numba/
+eeg_pipeline/.cuda-numba/
+eeg_pipeline/data/
+eeg_pipeline/outputs/
+eeg_pipeline/external/
 
-# Raw EEG data
-high-gamma-data/data/
-high-gamma-data/raw_data/
-high-gamma-data/datasets/
+braindecode-legacy/
+
 *.gdf
 *.edf
 *.bdf
 *.mat
-
-# Generated VAE data and checkpoints
-high-gamma-data/saved_vae*/
-high-gamma-data/saved_cvae*/
-high-gamma-data/saved_shared_cvae*/
 *.npz
 *.npy
 *.pt
@@ -36,35 +27,10 @@ high-gamma-data/saved_shared_cvae*/
 *.h5
 *.zip
 
-# Logs and process files
-high-gamma-data/logs/
 *.log
 *.pid
 nohup.out
 
-# Generated result tables
-# Keep these private until the metrics and presentation are final.
-high-gamma-data/results/
-
-# Old and temporary project files
-high-gamma-data/_archive_not_needed_for_current_run/
-high-gamma-data/archive_old_scripts/
-high-gamma-data/*.bak
-high-gamma-data/*before_single_file_update*
-
-# External cloned repositories
-# Add a proper citation or submodule later if required.
-high-gamma-data/external/
-
-# Local notebooks and temporary summaries
-high-gamma-data/*.ipynb
-
-# IDE and operating-system files
-.vscode/
-.idea/
-.DS_Store
-
-# Credentials and secrets
 .env
 .env.*
 *.pem
@@ -72,17 +38,6 @@ high-gamma-data/*.ipynb
 credentials.json
 secrets.json
 
-# Local legacy dependency
-/braindecode-legacy/
-
-# Temporary project notes
-high-gamma-data/CURRENT_RUN_README.txt
-
-# Temporary summary/table notebook generators
-high-gamma-data/create_results_summary_notebook.py
-high-gamma-data/create_simple_results_table_notebook.py
-high-gamma-data/archive/
-high-gamma-data/saved_*/
-archive/
-frozen_backup/
-high-gamma-data/outputs/
+.vscode/
+.idea/
+.DS_Store
