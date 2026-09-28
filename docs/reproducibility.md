@@ -9,7 +9,7 @@ Classifier environment
 Used for Braindecode classification.
 
 python3.11 -m venv env
-env/bin/pip install -r classifier-requirements-lock.txt
+env/bin/pip install -r requirements/classifier.txt
 env/bin/pip install -e ./braindecode-legacy
 
 VAE environment
@@ -17,7 +17,7 @@ VAE environment
 Used for VAE training, reconstruction, and generation.
 
 python3.11 -m venv vae-env
-vae-env/bin/pip install -r vae-requirements-lock.txt
+vae-env/bin/pip install -r requirements/vae.txt
 
 External repositories
 
@@ -39,7 +39,7 @@ Branch: hvEEGNet_paper
 
 Commit: 010426ea09f4151adc91ee7fcf3e81a3280c51bf
 
-Local directory: high-gamma-data/external/vae_repo/
+Expected local directory: eeg_pipeline/external/vae_repo/
 
 The VAE scripts import the repository's library modules directly.
 
@@ -62,13 +62,13 @@ Running the project
 Classifier experiments:
 
 source env/bin/activate
-cd high-gamma-data
+cd eeg_pipeline
 python -m experiments.run
 
 VAE experiments:
 
 source vae-env/bin/activate
-cd high-gamma-data
+cd eeg_pipeline
 python -m experiments.vae_make --help
 
 Raw data, generated outputs, model checkpoints, and logs are not stored in Git.

@@ -2,7 +2,9 @@
 
 set -Eeuo pipefail
 
-PROJECT_ROOT="/home/jovyan/eeg-repro/high-gamma-data"
+SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="\$(cd "\$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="\$REPO_ROOT/eeg_pipeline"
 CLASSIFIER_PY="$PROJECT_ROOT/../env/bin/python"
 VAE_PY="$PROJECT_ROOT/../vae-env/bin/python"
 

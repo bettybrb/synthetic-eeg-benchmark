@@ -1,45 +1,77 @@
-# Synthetic EEG for Motor-Imagery Classification
+# Synthetic EEG for Motor Imagery Classification
 
-Work-in-progress MSc Artificial Intelligence thesis project evaluating whether synthetic EEG can support motor-imagery classification.
+**MSc Artificial Intelligence thesis — Queen Mary University of London, 2026**
 
-## Project overview
+An experimental study of whether synthetic EEG can replace participant-specific real training data for motor-imagery classification while validation and testing remain entirely real.
 
-The project compares several approaches for producing training EEG:
+![Results overview](assets/results_overview.png)
 
-- statistical Gaussian generation;
-- hierarchical VAE reconstruction;
-- fixed-size replacement of real trials with reconstructed trials;
-- class-conditioned VAE generation, currently in development;
-- an autoregressive model is planned as an additional comparison.
+## Results
 
-A fixed High-Gamma-style Braindecode classifier is used for downstream evaluation. Validation and testing use real EEG data.
+| Training data | Real test accuracy |
+| --- | ---: |
+| Real EEG | **69.24% ± 16.06** |
+| H-VAE reconstruction | **68.06% ± 16.62** |
+| Best Gaussian generator | **31.91% ± 5.04** |
+| Conditional VAE | **25.73% ± 1.57** |
 
-## Dataset
+The main result was a clear distinction between **reconstruction** and **independent generation**. H-VAE reconstructions retained most of the discriminative information present in real trials, while independently generated synthetic EEG performed close to the four-class chance level.
 
-The experiments use BCI Competition IV Dataset 2a with:
+At 50% Gaussian replacement, accuracy fell to **56.35%**. A corresponding 50% augmentation experiment reached **60.34%**, providing no improvement over the real-only baseline.
 
-- 9 subjects;
-- 4 motor-imagery classes;
-- 22 EEG channels;
-- subject-specific training and evaluation.
+## Experimental design
 
-The original EEG data and generated arrays are not included in this repository because of their size and dataset-distribution requirements.
+The experiments use **BCI Competition IV Dataset 2a** across all 9 participants:
 
-## Current status
+- 4 motor-imagery classes: left hand, right hand, feet and tongue
+- 22 EEG channels sampled at 250 Hz
+- 4-second trials represented as 22 × 1000 samples
+- first recording session used for development
+- second recording session held out for final testing
+- generators fitted only on real training data
+- validation and test data always real
 
-This repository is actively being developed. Final experiment tables, consolidated results and documentation will be added after all methods are evaluated under a unified protocol.
+For each participant, the development session is split once into 259 training and 29 validation trials. The evaluation session contains 288 held-out test trials.
 
-## Main files
+## Methods
 
-- `high-gamma-data/run.py` — experiment runner
-- `high-gamma-data/classifier.py` — downstream EEG classifier
-- `high-gamma-data/data.py` — EEG loading and preprocessing
-- `high-gamma-data/generators.py` — Gaussian generators
-- `high-gamma-data/vae_make.py` — VAE reconstruction pipeline
-- `high-gamma-data/vae_ratio_classify.py` — fixed-size replacement experiments
-- `high-gamma-data/vae_shape.py` — reconstruction shape handling
-- `high-gamma-data/vae_evaluate.py` — VAE evaluation utilities
+The same **ShallowFBCSPNet** downstream classifier is used across conditions so that the source of the training EEG is the primary experimental variable.
+
+Synthetic conditions include:
+
+- eight Gaussian controls with different class, channel and time conditioning
+- H-VAE reconstruction using hvEEGNet
+- conditional VAE prior generation
+- exploratory class-specific and hierarchical conditional VAE variants
+- synthetic replacement and augmentation ratio experiments
+
+Classifier runs use three random seeds, with independent generator seeds used for synthetic generation experiments.
+
+## Why this matters
+
+The experiments show that producing EEG that preserves or resembles properties of the original signal is not sufficient evidence that the data are useful for downstream learning.
+
+The reconstruction model preserved existing task-relevant information, but the independently generative approaches did not reproduce enough discriminative structure to replace real participant-specific EEG under this protocol.
+
+## Repository structure
+
+```text
+eeg_pipeline/
+  pipeline/       Core data, classifier, generator and evaluation code
+  experiments/    Generation and downstream evaluation experiments
+scripts/           Final experiment runner
+results/           Final summary tables
+assets/            Portfolio figures
+docs/              Reproducibility notes
+requirements/      Locked classifier and VAE environments
+```
 
 ## Reproducibility
 
-Environment setup, exact dependency versions and final commands will be documented after the experimental pipeline is finalised.
+The original EEG recordings, generated arrays and model checkpoints are not distributed in this repository.
+
+Environment details, external repository versions and modifications are documented in [`docs/reproducibility.md`](docs/reproducibility.md).
+
+## Tech
+
+Python · PyTorch · Braindecode · NumPy · EEG · Brain-computer interfaces · Variational autoencoders · Synthetic data · Experimental evaluation
